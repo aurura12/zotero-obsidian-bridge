@@ -1,0 +1,27 @@
+# Release artifacts
+release/
+dist/
+*.xpi
+*.zip
+
+# Dependencies and package managers
+node_modules/
+.npm/
+.pnpm-store/
+
+# Logs and local config
+*.log
+.env
+.env.*
+
+# Editor and OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+# Obsidian vault state, if this repo is tested inside a vault
+.obsidian/workspace*
+.obsidian/cache/
+.trash/
