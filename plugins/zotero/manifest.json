@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Zotero Citekey Bridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Send Zotero citation keys to Obsidian and store literature-note links.",
   "author": "Yuxuan Qi",
   "applications": {
@@ -9,7 +9,7 @@
       "id": "zotero-citekey-bridge@yuxuanqi",
       "strict_min_version": "7.0",
       "strict_max_version": "9.0.*",
-      "update_url": "https://github.com/YuxuanQi/zotero-obsidian-bridge/releases/latest/download/zotero-updates.json"
+      "update_url": "https://github.com/KeiYuHin/zotero-obsidian-bridge/releases/latest/download/zotero-updates.json"
     }
   }
 }

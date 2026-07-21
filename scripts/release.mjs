@@ -8,6 +8,7 @@ let crcTable;
 const args = parseArgs(process.argv.slice(2));
 const version = args.version || readJson("plugins/obsidian/manifest.json").version;
 const shouldPackage = !args["no-package"];
+const githubRepo = args["github-repo"] || "KeiYuHin/zotero-obsidian-bridge";
 
 if (args.clean) {
   rmSync(path("release"), { recursive: true, force: true });
@@ -17,12 +18,16 @@ if (args.clean) {
 
 assertVersion(version);
 syncVersions(version, {
-  zoteroUpdateUrl: args["zotero-update-url"],
+  zoteroUpdateUrl:
+    args["zotero-update-url"] ||
+    `https://github.com/${githubRepo}/releases/latest/download/zotero-updates.json`,
 });
 
 if (shouldPackage) {
   packageRelease(version, {
-    zoteroUpdateLink: args["zotero-update-link"],
+    zoteroUpdateLink:
+      args["zotero-update-link"] ||
+      `https://github.com/${githubRepo}/releases/download/${version}/zotero-citekey-bridge-${version}.xpi`,
   });
 }
 
@@ -97,16 +102,13 @@ function packageRelease(nextVersion, options) {
   );
 
   const zoteroManifest = readJson("plugins/zotero/manifest.json");
-  const updateLink =
-    options.zoteroUpdateLink ||
-    `https://github.com/YuxuanQi/zotero-obsidian-bridge/releases/download/${nextVersion}/zotero-citekey-bridge-${nextVersion}.xpi`;
   const updateManifest = {
     addons: {
       [zoteroManifest.applications.zotero.id]: {
         updates: [
           {
             version: nextVersion,
-            update_link: updateLink,
+            update_link: options.zoteroUpdateLink,
             update_hash: `sha256:${sha256(zoteroArchive)}`,
             applications: {
               zotero: {

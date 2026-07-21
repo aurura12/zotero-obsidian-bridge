@@ -11,11 +11,13 @@ This repository contains two small plugins that are meant to be versioned and re
 
 ## Requirements
 
-- Zotero 7 or later.
-- Better BibTeX for Zotero, unless your Zotero version exposes a native `citationKey` field.
-- Obsidian desktop.
-- Zotero Integration for Obsidian, plugin ID `obsidian-zotero-desktop-connector`.
+- [Zotero](https://www.zotero.org/) 7 or later.
+- [Better BibTeX for Zotero](https://retorque.re/zotero-better-bibtex/installation/), unless your Zotero version exposes a native `citationKey` field.
+- [Obsidian desktop](https://obsidian.md/).
+- [Zotero Integration for Obsidian](https://community.obsidian.md/plugins/obsidian-zotero-desktop-connector), plugin ID `obsidian-zotero-desktop-connector`.
 - A Zotero Integration import format named `Paper Note`, or an explicit `format` query parameter in the URL.
+
+For first-time setup, start with Obsidian's official [Community plugins](https://obsidian.md/help/community-plugins) guide, Zotero's official [Plugins for Zotero](https://www.zotero.org/support/plugins) page, and the Zotero Integration plugin page above. This gives newcomers the normal Obsidian-first installation path before adding this bridge.
 
 ## Workflow
 
@@ -24,6 +26,8 @@ This repository contains two small plugins that are meant to be versioned and re
 3. It opens `obsidian://zotero-note?citekey=<citekey>`.
 4. The Obsidian plugin receives the citekey and calls Zotero Integration's `runImport(format, citekey, library)`.
 5. The Zotero plugin stores an `Obsidian Link:` in the item's `Extra` field for later opening.
+
+Stored Obsidian note links include `paneType=tab`, so opening a linked note from Zotero opens it in a new Obsidian tab instead of replacing the current active tab. See Obsidian's [URI documentation](https://obsidian.md/help/uri) for the `paneType` parameter.
 
 ## Repository Layout
 
@@ -41,13 +45,19 @@ release/       generated artifacts, ignored by git
 With Make:
 
 ```sh
-make release VERSION=0.1.0 GITHUB_REPO=YuxuanQi/zotero-obsidian-bridge
+make release VERSION=0.1.0
 ```
 
 Without Make:
 
 ```sh
 node scripts/release.mjs --version 0.1.0
+```
+
+The default GitHub repository is `KeiYuHin/zotero-obsidian-bridge`. To package for a fork:
+
+```sh
+make release VERSION=0.1.0 GITHUB_REPO=owner/repo
 ```
 
 The release command updates internal versions and writes:

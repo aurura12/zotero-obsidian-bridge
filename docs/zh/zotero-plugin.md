@@ -1,4 +1,4 @@
-# Zotero Obsidian Citekey Link
+# Zotero Citekey Bridge
 
 一个面向 Zotero 7–9 的轻量插件。它从 Zotero / Better BibTeX 读取 citation key，并通过 Obsidian URI 完成文献笔记创建、链接保存和打开。
 
@@ -7,7 +7,9 @@
 - Obsidian Vault：`ObsidianVault`
 - 文献笔记目录：`ZoteroLib`
 - 创建接口：`obsidian://zotero-note?citekey=[citekey]`
-- 打开接口：`obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F[citekey]`
+- 打开接口：`obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F[citekey]&paneType=tab`
+
+`paneType=tab` 会让 Obsidian 在新标签页打开笔记，见 Obsidian 官方 [URI 文档](https://obsidian.md/help/uri)。
 
 如需修改，在 `obsidian-zotero-link.js` 顶部的 `config` 中调整：
 
@@ -25,7 +27,7 @@ config: Object.freeze({
 1. 打开 Zotero。
 2. 进入“工具 → 插件”（部分版本显示为“工具 → 附加组件”）。
 3. 点击齿轮菜单，选择“Install Add-on From File / 从文件安装插件”。
-4. 选择 `zotero-obsidian-citekey-link-1.0.0.xpi`。
+4. 选择 `zotero-citekey-bridge-[version].xpi`。
 5. 按 Zotero 提示重启。
 
 ## 右键菜单
@@ -43,7 +45,7 @@ config: Object.freeze({
 4. 调用：
    `obsidian://zotero-note?citekey=[URL 编码后的 citekey]`
 5. 在 Zotero 条目 `Extra` 中保存：
-   `Obsidian Link: obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F[citekey]`
+   `Obsidian Link: obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F[citekey]&paneType=tab`
 
 ### 2. 调试：删除 Obsidian 跳转链接
 
@@ -74,7 +76,7 @@ Zotero 中可在“工具 → 开发者 → 错误控制台”查看错误。
 插件日志前缀：
 
 ```text
-Zotero Obsidian Citekey Link:
+Zotero Citekey Bridge:
 ```
 
 ## 文件说明
@@ -88,9 +90,7 @@ Zotero Obsidian Citekey Link:
 已在 `manifest.json` 中补充 Zotero 9 要求的
 `applications.zotero.update_url`，并将兼容上限规范为 `9.0.*`。
 
-当前更新地址使用保留域名 `example.invalid` 作为本地插件占位地址，
-不会连接到真实第三方服务，也不会自动下载更新。正式发布插件时，
-再将其替换为真实的 `updates.json` 地址。
+当前更新地址指向 GitHub Release 中的 `zotero-updates.json`。正式发版前确认仓库地址为 `KeiYuHin/zotero-obsidian-bridge`，然后用 Makefile 或 release 脚本重新打包。
 
 ## 交互优化
 
@@ -101,4 +101,3 @@ Zotero Obsidian Citekey Link:
 - 其他错误和状态提示保持原来的阻塞式提示方式。
 
 说明：若操作系统本身未注册 `obsidian://`，或设备受到系统/组织安全策略限制，系统仍可能阻止启动 Obsidian；插件无法绕过操作系统级安全策略。
-

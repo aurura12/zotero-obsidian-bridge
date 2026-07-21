@@ -3,7 +3,7 @@ Zotero 中已有 batter bib latex 它基于每个文章的作者与名称生成�
 我需要在Zotero中实现：
 
 - 访问链接`obsidian://zotero-note?citekey=[citekey]`一个已在obsidian中配置好的接口，它能据citekey调用模板创建md文件
-- Zotero保存跳转obsidian链接 `obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F{{citekey}}` 一个能借此指向obsidian中新创建的文件。
+- Zotero保存跳转obsidian链接 `obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F{{citekey}}&paneType=tab` 一个能借此指向obsidian中新创建的文件，并在 Obsidian 新标签页中打开。
 
 交互：
 

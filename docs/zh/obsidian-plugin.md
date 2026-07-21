@@ -30,7 +30,9 @@ obsidian://zotero-note?citekey=panditFrequencySupportElectric2025
     
 6. **Shows success/failure notifications** to the user
 
-依赖 obsidian-zotero-desktop-connector 中的 runImport `zoteroIntegration.runImport()`。它并不是一个稳定发布的API。但是调用的是zotero integration，我这里自己创建了一个叫做 Paper Note 的 Import format。
+依赖 [Zotero Integration](https://community.obsidian.md/plugins/obsidian-zotero-desktop-connector) 中的 runImport `zoteroIntegration.runImport()`。它并不是一个稳定发布的API。但是调用的是zotero integration，我这里自己创建了一个叫做 Paper Note 的 Import format。
+
+安装依赖时，小白可以先按 Obsidian 官方 [Community plugins](https://obsidian.md/help/community-plugins) 文档打开社区插件，再搜索安装 Zotero Integration。Zotero 侧需要先装好 [Better BibTeX](https://retorque.re/zotero-better-bibtex/installation/)，因为 Zotero Integration 本身也要求 Better BibTeX。
 
 这样能在zotero integration中测试好，使用这个东西来外部调用，而跳过zotero integration的UI打断。
 

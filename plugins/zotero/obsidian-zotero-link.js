@@ -377,7 +377,8 @@ var ZoteroObsidianCitekeyLink = {
 			"obsidian://open?vault=" +
 			encodeURIComponent(this.config.vaultName) +
 			"&file=" +
-			encodeURIComponent(file)
+			encodeURIComponent(file) +
+			"&paneType=tab"
 		);
 	},
 

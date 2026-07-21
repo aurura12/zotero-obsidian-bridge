@@ -14,7 +14,7 @@ zoteroImportDate: "{{importDate | format('YYYY-MM-DD HH:mm')}}"
 
 **Auther:** {{authors}}
 
-[Goto Zotero](zotero://select/items/@{{citekey}}), [Goto Obsidian](obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F{{citekey}}), [Goto Online](https://doi.org/{{DOI}})
+[Goto Zotero](zotero://select/items/@{{citekey}}), [Goto Obsidian](obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F{{citekey}}&paneType=tab), [Goto Online](https://doi.org/{{DOI}})
 
 ---
 {% persist "paper-notes" %} 

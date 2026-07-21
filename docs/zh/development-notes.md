@@ -1,3 +1,10 @@
+更新Idea
+
+- Makefile。如果能基于简单的makefile实现打包发布。更新仓库地址 `https://github.com/KeiYuHin/zotero-obsidian-bridge`
+- 从打开文件，改为新标签页中打开文件：加入参数`&paneType=tab`新标签页中打开
+  - obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F{{citekey}}
+  - obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F{{citekey}}&paneType=tab
+- 更新文档，链接指向现在网上常有的Obsidian为主的数据库（网上很多教程，这样能让小白安装好两个依赖）。
 
 # 本地PDF文件（弃用）
 
@@ -12,6 +19,7 @@ key: {{key}}
 DOI: "{{DOI}}"
 toZoteroUrl_1: "zotero://select/items/@{{citekey}}"
 toZoteroUrl_2: "{{desktopURI}}"
+
 templateVersion: "0.1.0"
 ---
 
@@ -49,7 +57,7 @@ zotero-obsidian-bridge/ (你的项目根目录)
 
 目前经测试，以下的url可以实现在不同项目中跳转
 
-[Goto Obsidian](obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F{{citationKey}})
+[Goto Obsidian](obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F{{citationKey}}&paneType=tab)
 [Goto Zotero](zotero://select/items/@{{citekey}})
 
 目前已完成，Obsidian中基于Obsidian Zotero Integration，加上template的设置，实现了可以在Obsidian中创建md文件，并且有能力跳转到zotero。
@@ -163,4 +171,3 @@ obsidian://zotero-note?citekey=falahatiGridSecondaryFrequency2018
 目前重复导入会覆盖，接下来应该能在template里面解决。
 
 ---
-

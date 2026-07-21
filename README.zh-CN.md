@@ -9,11 +9,13 @@
 
 ## 依赖
 
-- Zotero 7 或更新版本。
-- Better BibTeX for Zotero；如果你的 Zotero 已提供原生 `citationKey` 字段，也可以由插件优先读取原生字段。
-- Obsidian 桌面版。
-- Obsidian 的 Zotero Integration 插件，插件 ID 为 `obsidian-zotero-desktop-connector`。
+- [Zotero](https://www.zotero.org/) 7 或更新版本。
+- [Better BibTeX for Zotero](https://retorque.re/zotero-better-bibtex/installation/)；如果你的 Zotero 已提供原生 `citationKey` 字段，也可以由插件优先读取原生字段。
+- [Obsidian 桌面版](https://obsidian.md/)。
+- Obsidian 的 [Zotero Integration](https://community.obsidian.md/plugins/obsidian-zotero-desktop-connector) 插件，插件 ID 为 `obsidian-zotero-desktop-connector`。
 - 一个名为 `Paper Note` 的 Zotero Integration import format；也可以在 URL 里传入 `format` 参数覆盖默认值。
+
+给第一次配置 Obsidian 文献数据库的新手：先看 Obsidian 官方的 [Community plugins](https://obsidian.md/help/community-plugins) 安装说明，再安装 Zotero Integration；Zotero 侧插件安装可参考 Zotero 官方的 [Plugins for Zotero](https://www.zotero.org/support/plugins)，Better BibTeX 则看上面的官方安装页。这样路径更接近网上常见的“Obsidian 文献库/文献数据库”教程：先让 Obsidian 能从 Zotero 导入文献笔记，再安装这个 bridge 做从 Zotero 发起的一键调用。
 
 ## 工作流
 
@@ -22,6 +24,8 @@
 3. Zotero 端读取 citekey，并打开 `obsidian://zotero-note?citekey=<citekey>`。
 4. Obsidian 端接收 citekey，调用 Zotero Integration 的 `runImport(format, citekey, library)`。
 5. Zotero 端在该条目的 `Extra` 中写入 `Obsidian Link:`，之后可以直接从 Zotero 打开对应笔记。
+
+写回 Zotero 的 Obsidian 打开链接会带上 `paneType=tab`，因此从 Zotero 打开笔记时会在 Obsidian 新标签页中打开，而不是替换当前活动标签。这个参数来自 Obsidian 官方 [URI 文档](https://obsidian.md/help/uri)。
 
 ## Zotero 右键菜单
 
@@ -64,13 +68,19 @@ release/       生成的发布文件，已加入 .gitignore
 如果安装了 Make：
 
 ```sh
-make release VERSION=0.1.0 GITHUB_REPO=YuxuanQi/zotero-obsidian-bridge
+make release VERSION=0.1.0
 ```
 
 如果没有 Make：
 
 ```sh
 node scripts/release.mjs --version 0.1.0
+```
+
+默认 GitHub 仓库是 `KeiYuHin/zotero-obsidian-bridge`。如果将来给 fork 打包，可以覆盖：
+
+```sh
+make release VERSION=0.1.0 GITHUB_REPO=owner/repo
 ```
 
 脚本会同步更新：
