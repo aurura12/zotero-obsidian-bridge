@@ -34,6 +34,25 @@ obsidian://zotero-note?citekey=panditFrequencySupportElectric2025
 
 安装依赖时，小白可以先按 Obsidian 官方 [Community plugins](https://obsidian.md/help/community-plugins) 文档打开社区插件，再搜索安装 Zotero Integration。Zotero 侧需要先装好 [Better BibTeX](https://retorque.re/zotero-better-bibtex/installation/)，因为 Zotero Integration 本身也要求 Better BibTeX。
 
+## Obsidian 端必须配置的地方
+
+这里的 `ObsidianVault` 是 Obsidian vault 名，不是 GitHub 仓库名。默认配置假设：
+
+- Obsidian vault 名为 `ObsidianVault`。
+- vault 内有一个文件夹 `ZoteroLib`。
+- Zotero Integration 中有一个 import format，`Name` 为 `Paper Note`。
+- 这个 import format 的 `Output path` 为 `ZoteroLib/{{citekey}}.md`。
+
+`Paper Note` 是插件默认调用的 format 名，需要完全一致。如果你把它命名成别的，需要修改 Obsidian 端插件里的默认 format，或在 URL 中传入 `format=...`。
+
+Zotero 端插件会把打开链接保存为：
+
+```text
+obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F[citekey]&paneType=tab
+```
+
+因此 Zotero 端 `config.vaultName`、`config.folder` 必须和 Obsidian 端的 vault 名、输出文件夹保持一致。
+
 这样能在zotero integration中测试好，使用这个东西来外部调用，而跳过zotero integration的UI打断。
 
 ```

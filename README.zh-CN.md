@@ -17,6 +17,31 @@
 
 给第一次配置 Obsidian 文献数据库的新手：先看 Obsidian 官方的 [Community plugins](https://obsidian.md/help/community-plugins) 安装说明，再安装 Zotero Integration；Zotero 侧插件安装可参考 Zotero 官方的 [Plugins for Zotero](https://www.zotero.org/support/plugins)，Better BibTeX 则看上面的官方安装页。这样路径更接近网上常见的“Obsidian 文献库/文献数据库”教程：先让 Obsidian 能从 Zotero 导入文献笔记，再安装这个 bridge 做从 Zotero 发起的一键调用。
 
+## 必须对应的配置
+
+这里的“仓库名”指 Obsidian 的 vault 名，不是 GitHub repository 名。默认配置假设你的 Obsidian vault 叫 `ObsidianVault`，并且 vault 里有一个文件夹 `ZoteroLib` 用来存放文献笔记。
+
+Obsidian 端需要先配置 Zotero Integration：
+
+- 在 Obsidian vault `ObsidianVault` 中新建文件夹 `ZoteroLib`。
+- 在 Zotero Integration 中新建或修改 import format，名称设为 `Paper Note`。
+- 该 import format 的 `Output path` 设为 `ZoteroLib/{{citekey}}.md`。
+
+`Paper Note` 这个名字需要和插件默认值完全一致，包括空格和拼写。
+
+Zotero 端插件的默认配置必须和上面对应：
+
+```js
+config: Object.freeze({
+  vaultName: "ObsidianVault",
+  folder: "ZoteroLib",
+  extraLabel: "Obsidian Link",
+  createBaseURL: "obsidian://zotero-note"
+})
+```
+
+如果你的 Obsidian vault 不叫 `ObsidianVault`，或文献笔记不放在 `ZoteroLib`，需要同时修改 Zotero 端 `config` 和 Zotero Integration 的 `Output path`。如果你的 import format 不叫 `Paper Note`，则需要在调用 URL 中传入 `format=...`，或修改 Obsidian 端插件里的默认 format。
+
 ## 工作流
 
 1. 在 Zotero 中选择一条普通文献条目。

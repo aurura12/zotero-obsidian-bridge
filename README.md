@@ -19,6 +19,31 @@ This repository contains two small plugins that are meant to be versioned and re
 
 For first-time setup, start with Obsidian's official [Community plugins](https://obsidian.md/help/community-plugins) guide, Zotero's official [Plugins for Zotero](https://www.zotero.org/support/plugins) page, and the Zotero Integration plugin page above. This gives newcomers the normal Obsidian-first installation path before adding this bridge.
 
+## Matching Configuration
+
+In this project, "vault name" means the Obsidian vault name, not the GitHub repository name. The default setup assumes an Obsidian vault named `ObsidianVault` and a folder named `ZoteroLib` inside that vault for literature notes.
+
+Configure the Obsidian side first:
+
+- Create the folder `ZoteroLib` in the Obsidian vault `ObsidianVault`.
+- In Zotero Integration, create or edit an import format named `Paper Note`.
+- Set that import format's `Output path` to `ZoteroLib/{{citekey}}.md`.
+
+The `Paper Note` name must exactly match the plugin default, including spelling and spaces.
+
+The Zotero plugin defaults must match those choices:
+
+```js
+config: Object.freeze({
+  vaultName: "ObsidianVault",
+  folder: "ZoteroLib",
+  extraLabel: "Obsidian Link",
+  createBaseURL: "obsidian://zotero-note"
+})
+```
+
+If your Obsidian vault is not named `ObsidianVault`, or your notes are not stored in `ZoteroLib`, update both the Zotero plugin `config` and Zotero Integration's `Output path`. If your import format is not named `Paper Note`, pass a `format=...` URL parameter or change the Obsidian plugin's default format.
+
 ## Workflow
 
 1. In Zotero, right-click a regular item and choose `创建并关联 Obsidian 笔记`.

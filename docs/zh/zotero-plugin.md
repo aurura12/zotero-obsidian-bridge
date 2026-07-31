@@ -9,6 +9,15 @@
 - 创建接口：`obsidian://zotero-note?citekey=[citekey]`
 - 打开接口：`obsidian://open?vault=ObsidianVault&file=ZoteroLib%2F[citekey]&paneType=tab`
 
+这里的 Obsidian Vault 指 Obsidian 中打开的 vault 名，不是 GitHub 仓库名。默认情况下，Obsidian 端需要存在 vault `ObsidianVault`，其中有文件夹 `ZoteroLib`。
+
+Zotero Integration 中对应的 import format 应设为：
+
+- `Name`：`Paper Note`
+- `Output path`：`ZoteroLib/{{citekey}}.md`
+
+`Paper Note` 需要和 Obsidian 端插件默认 format 名完全一致，包括空格和拼写。
+
 `paneType=tab` 会让 Obsidian 在新标签页打开笔记，见 Obsidian 官方 [URI 文档](https://obsidian.md/help/uri)。
 
 如需修改，在 `obsidian-zotero-link.js` 顶部的 `config` 中调整：
@@ -21,6 +30,8 @@ config: Object.freeze({
     createBaseURL: "obsidian://zotero-note"
 })
 ```
+
+如果修改了 `vaultName` 或 `folder`，请同步修改 Obsidian 端 Zotero Integration 的 `Output path`。如果 Zotero Integration 的 import format 不叫 `Paper Note`，需要在 Obsidian 端插件中修改默认 format，或在调用 URL 里传入 `format` 参数。
 
 ## 安装
 
