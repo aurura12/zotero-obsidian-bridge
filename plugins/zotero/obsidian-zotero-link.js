@@ -1,13 +1,13 @@
 var ZoteroObsidianCitekeyLink = {
-	TITLE: "Zotero Citekey Bridge",
-	MENU_PREFIX: "zotero-obsidian-citekey-link",
+	TITLE: 'Zotero Citekey Bridge',
+	MENU_PREFIX: 'zotero-obsidian-citekey-link',
 	windows: new Map(),
 
 	config: Object.freeze({
-		vaultName: "ObsidianVault",
-		folder: "ZoteroLib",
-		extraLabel: "Obsidian Link",
-		createBaseURL: "obsidian://zotero-note"
+		vaultName: '论文',
+		folder: 'maic',
+		extraLabel: 'Obsidian Link',
+		createBaseURL: 'obsidian://zotero-note',
 	}),
 
 	init({ id, version, rootURI }) {
@@ -36,43 +36,41 @@ var ZoteroObsidianCitekeyLink = {
 		}
 
 		const doc = win.document;
-		const popup = doc.getElementById("zotero-itemmenu");
+		const popup = doc.getElementById('zotero-itemmenu');
 		if (!popup) {
-			Zotero.debug(
-				"Zotero Citekey Bridge: #zotero-itemmenu not found"
-			);
+			Zotero.debug('Zotero Citekey Bridge: #zotero-itemmenu not found');
 			return;
 		}
 
 		const createXULElement = (tagName) => {
-			if (typeof doc.createXULElement === "function") {
+			if (typeof doc.createXULElement === 'function') {
 				return doc.createXULElement(tagName);
 			}
 			return doc.createElement(tagName);
 		};
 
-		const separator = createXULElement("menuseparator");
+		const separator = createXULElement('menuseparator');
 		separator.id = `${this.MENU_PREFIX}-separator`;
 
 		const createItem = this.makeMenuItem(
 			win,
 			`${this.MENU_PREFIX}-create`,
-			"创建并关联 Obsidian 笔记",
-			() => this.createAndLink(win)
+			'创建并关联 Obsidian 笔记',
+			() => this.createAndLink(win),
 		);
 
 		const deleteItem = this.makeMenuItem(
 			win,
 			`${this.MENU_PREFIX}-delete`,
-			"调试：删除 Obsidian 跳转链接",
-			() => this.deleteStoredLink(win)
+			'调试：删除 Obsidian 跳转链接',
+			() => this.deleteStoredLink(win),
 		);
 
 		const openItem = this.makeMenuItem(
 			win,
 			`${this.MENU_PREFIX}-open`,
-			"打开 Obsidian 笔记",
-			() => this.openStoredLink(win)
+			'打开 Obsidian 笔记',
+			() => this.openStoredLink(win),
 		);
 
 		popup.append(separator, createItem, deleteItem, openItem);
@@ -82,19 +80,18 @@ var ZoteroObsidianCitekeyLink = {
 			const enabled = Boolean(item);
 			for (const element of [createItem, deleteItem, openItem]) {
 				if (enabled) {
-					element.removeAttribute("disabled");
-				}
-				else {
-					element.setAttribute("disabled", "true");
+					element.removeAttribute('disabled');
+				} else {
+					element.setAttribute('disabled', 'true');
 				}
 			}
 		};
 
-		popup.addEventListener("popupshowing", onPopupShowing);
+		popup.addEventListener('popupshowing', onPopupShowing);
 		this.windows.set(win, {
 			popup,
 			onPopupShowing,
-			elements: [separator, createItem, deleteItem, openItem]
+			elements: [separator, createItem, deleteItem, openItem],
 		});
 	},
 
@@ -104,10 +101,7 @@ var ZoteroObsidianCitekeyLink = {
 			return;
 		}
 
-		state.popup?.removeEventListener(
-			"popupshowing",
-			state.onPopupShowing
-		);
+		state.popup?.removeEventListener('popupshowing', state.onPopupShowing);
 
 		for (const element of state.elements) {
 			element?.remove();
@@ -118,13 +112,14 @@ var ZoteroObsidianCitekeyLink = {
 
 	makeMenuItem(win, id, label, callback) {
 		const doc = win.document;
-		const menuItem = typeof doc.createXULElement === "function"
-			? doc.createXULElement("menuitem")
-			: doc.createElement("menuitem");
+		const menuItem =
+			typeof doc.createXULElement === 'function'
+				? doc.createXULElement('menuitem')
+				: doc.createElement('menuitem');
 
 		menuItem.id = id;
-		menuItem.setAttribute("label", label);
-		menuItem.addEventListener("command", () => {
+		menuItem.setAttribute('label', label);
+		menuItem.addEventListener('command', () => {
 			Promise.resolve(callback()).catch((error) => {
 				this.handleError(win, label, error);
 			});
@@ -152,7 +147,7 @@ var ZoteroObsidianCitekeyLink = {
 		if (!item) {
 			this.alert(
 				win,
-				"请只选择一条普通文献条目后再执行。附件、笔记和多选状态不支持。"
+				'请只选择一条普通文献条目后再执行。附件、笔记和多选状态不支持。',
 			);
 		}
 		return item;
@@ -168,8 +163,8 @@ var ZoteroObsidianCitekeyLink = {
 		if (existingLink) {
 			this.alert(
 				win,
-				"该条目已经保存了 Obsidian 跳转链接，已停止重复创建。\n\n" +
-				"如需重新生成，请先执行“调试：删除 Obsidian 跳转链接”。"
+				'该条目已经保存了 Obsidian 跳转链接，已停止重复创建。\n\n' +
+					'如需重新生成，请先执行“调试：删除 Obsidian 跳转链接”。',
 			);
 			return;
 		}
@@ -178,8 +173,8 @@ var ZoteroObsidianCitekeyLink = {
 		if (!citekey) {
 			this.alert(
 				win,
-				"未找到 citation key。\n\n" +
-				"请确认 Better BibTeX 已启用，并已为该条目生成 citation key。"
+				'未找到 citation key。\n\n' +
+					'请确认 Better BibTeX 已启用，并已为该条目生成 citation key。',
 			);
 			return;
 		}
@@ -194,10 +189,7 @@ var ZoteroObsidianCitekeyLink = {
 
 		await this.setStoredLink(item, openURL);
 
-		this.notify(
-			`已创建并关联 Obsidian 笔记\n${citekey}`,
-			3500
-		);
+		this.notify(`已创建并关联 Obsidian 笔记\n${citekey}`, 3500);
 	},
 
 	async deleteStoredLink(win) {
@@ -206,28 +198,28 @@ var ZoteroObsidianCitekeyLink = {
 			return;
 		}
 
-		const extra = String(item.getField("extra") || "");
+		const extra = String(item.getField('extra') || '');
 		const updated = this.removeLinkLines(extra);
 
 		if (updated === extra) {
-			this.alert(win, "该条目没有保存 Obsidian 跳转链接。");
+			this.alert(win, '该条目没有保存 Obsidian 跳转链接。');
 			return;
 		}
 
 		const confirmed = Services.prompt.confirm(
 			win,
 			this.TITLE,
-			"确定删除该条目保存的 Obsidian 跳转链接吗？\n\n" +
-			"删除后，可再次执行创建操作重新生成关联。"
+			'确定删除该条目保存的 Obsidian 跳转链接吗？\n\n' +
+				'删除后，可再次执行创建操作重新生成关联。',
 		);
 		if (!confirmed) {
 			return;
 		}
 
-		item.setField("extra", updated);
+		item.setField('extra', updated);
 		await item.saveTx();
 
-		this.alert(win, "已删除该条目保存的 Obsidian 跳转链接。");
+		this.alert(win, '已删除该条目保存的 Obsidian 跳转链接。');
 	},
 
 	async openStoredLink(win) {
@@ -240,8 +232,8 @@ var ZoteroObsidianCitekeyLink = {
 		if (!link) {
 			this.alert(
 				win,
-				"该条目尚未保存 Obsidian 跳转链接。\n\n" +
-				"请先执行“创建并关联 Obsidian 笔记”。"
+				'该条目尚未保存 Obsidian 跳转链接。\n\n' +
+					'请先执行“创建并关联 Obsidian 笔记”。',
 			);
 			return;
 		}
@@ -249,25 +241,23 @@ var ZoteroObsidianCitekeyLink = {
 		this.launchObsidianURL(link);
 	},
 
-
 	launchObsidianURL(url) {
-		const schemeMatch = String(url || "").match(/^([a-z][a-z0-9+.-]+):/i);
+		const schemeMatch = String(url || '').match(/^([a-z][a-z0-9+.-]+):/i);
 		const scheme = schemeMatch?.[1]?.toLowerCase();
-		if (scheme !== "obsidian") {
-			throw new Error(`不允许打开非 Obsidian 协议：${scheme || "未知"}`);
+		if (scheme !== 'obsidian') {
+			throw new Error(`不允许打开非 Obsidian 协议：${scheme || '未知'}`);
 		}
 
 		const service = Components.classes[
-			"@mozilla.org/uriloader/external-protocol-service;1"
+			'@mozilla.org/uriloader/external-protocol-service;1'
 		].getService(Components.interfaces.nsIExternalProtocolService);
 
 		const found = {};
-		const handlerInfo = service.getProtocolHandlerInfoFromOS(
-			scheme,
-			found
-		);
+		const handlerInfo = service.getProtocolHandlerInfoFromOS(scheme, found);
 		if (!found.value) {
-			throw new Error("系统中未找到 Obsidian 协议处理器，请确认 Obsidian 已正确安装。");
+			throw new Error(
+				'系统中未找到 Obsidian 协议处理器，请确认 Obsidian 已正确安装。',
+			);
 		}
 
 		handlerInfo.preferredAction =
@@ -279,7 +269,7 @@ var ZoteroObsidianCitekeyLink = {
 		}
 
 		const uri = Services.io.newURI(url, null, null);
-		if (typeof handlerInfo.launchWithURI === "function") {
+		if (typeof handlerInfo.launchWithURI === 'function') {
 			handlerInfo.launchWithURI(uri, null);
 			return;
 		}
@@ -287,29 +277,25 @@ var ZoteroObsidianCitekeyLink = {
 		// Compatibility fallback for platforms where launchWithURI is unavailable.
 		Services.prefs.setBoolPref(
 			`network.protocol-handler.warn-external.${scheme}`,
-			false
+			false,
 		);
 		Services.prefs.setBoolPref(
 			`network.protocol-handler.external.${scheme}`,
-			true
+			true,
 		);
-		service.loadURI(
-			uri,
-			Services.scriptSecurityManager.getSystemPrincipal()
-		);
+		service.loadURI(uri, Services.scriptSecurityManager.getSystemPrincipal());
 	},
 
 	notify(message, timeout = 3500) {
 		try {
 			const progressWindow = new Zotero.ProgressWindow({
-				closeOnClick: false
+				closeOnClick: false,
 			});
 			progressWindow.changeHeadline(this.TITLE);
 			progressWindow.addDescription(String(message));
 			progressWindow.show();
 			progressWindow.startCloseTimer(timeout);
-		}
-		catch (error) {
+		} catch (error) {
 			Zotero.logError(error);
 		}
 	},
@@ -317,94 +303,87 @@ var ZoteroObsidianCitekeyLink = {
 	async getCitationKey(item) {
 		// Zotero 8/9: citation key is a native item field.
 		try {
-			const nativeKey = this.cleanCitationKey(
-				item.getField("citationKey")
-			);
+			const nativeKey = this.cleanCitationKey(item.getField('citationKey'));
 			if (nativeKey) {
 				return nativeKey;
 			}
-		}
-		catch (error) {
+		} catch (error) {
 			// Zotero 7 does not expose this native field.
 		}
 
 		// Zotero 7 and Better BibTeX-compatible fallback.
 		try {
 			const bbt = Zotero.BetterBibTeX;
-			if (bbt?.ready && typeof bbt.ready.then === "function") {
+			if (bbt?.ready && typeof bbt.ready.then === 'function') {
 				await bbt.ready;
 			}
 
 			const record = bbt?.KeyManager?.get?.(item.id);
 			const bbtKey = this.cleanCitationKey(
-				record?.citationKey || record?.citekey
+				record?.citationKey || record?.citekey,
 			);
 			if (bbtKey) {
 				return bbtKey;
 			}
-		}
-		catch (error) {
-			Zotero.debug(
-				"Zotero Citekey Bridge: Better BibTeX key lookup failed"
-			);
+		} catch (error) {
+			Zotero.debug('Zotero Citekey Bridge: Better BibTeX key lookup failed');
 			Zotero.logError(error);
 		}
 
 		// Compatibility fallback for libraries that retain keys in Extra.
-		const extra = String(item.getField("extra") || "");
+		const extra = String(item.getField('extra') || '');
 		const match = extra.match(
-			/^\s*(?:Citation Key|citation-key|citationKey)\s*:\s*(.+?)\s*$/mi
+			/^\s*(?:Citation Key|citation-key|citationKey)\s*:\s*(.+?)\s*$/im,
 		);
 		return this.cleanCitationKey(match?.[1]);
 	},
 
 	cleanCitationKey(value) {
-		return String(value || "")
+		return String(value || '')
 			.trim()
-			.replace(/^@/, "");
+			.replace(/^@/, '');
 	},
 
 	buildCreateURL(citekey) {
 		return (
-			`${this.config.createBaseURL}?citekey=` +
-			encodeURIComponent(citekey)
+			`${this.config.createBaseURL}?citekey=` + encodeURIComponent(citekey)
 		);
 	},
 
 	buildOpenURL(citekey) {
 		const file = `${this.config.folder}/${citekey}`;
 		return (
-			"obsidian://open?vault=" +
+			'obsidian://open?vault=' +
 			encodeURIComponent(this.config.vaultName) +
-			"&file=" +
+			'&file=' +
 			encodeURIComponent(file) +
-			"&paneType=tab"
+			'&paneType=tab'
 		);
 	},
 
 	getStoredLink(item) {
-		const extra = String(item.getField("extra") || "");
+		const extra = String(item.getField('extra') || '');
 		const escapedLabel = this.escapeRegExp(this.config.extraLabel);
 		const match = extra.match(
 			new RegExp(
 				`^\\s*${escapedLabel}\\s*:\\s*(obsidian:\\/\\/open\\?[^\\r\\n]+?)\\s*$`,
-				"mi"
-			)
+				'mi',
+			),
 		);
-		return match?.[1]?.trim() || "";
+		return match?.[1]?.trim() || '';
 	},
 
 	async setStoredLink(item, url) {
-		const extra = String(item.getField("extra") || "");
+		const extra = String(item.getField('extra') || '');
 		const cleaned = this.removeLinkLines(extra);
-		const lines = cleaned ? cleaned.split("\n") : [];
+		const lines = cleaned ? cleaned.split('\n') : [];
 
 		while (lines.length && !lines[lines.length - 1].trim()) {
 			lines.pop();
 		}
 
 		lines.push(`${this.config.extraLabel}: ${url}`);
-		item.setField("extra", lines.join("\n"));
+		item.setField('extra', lines.join('\n'));
 		await item.saveTx();
 	},
 
@@ -412,42 +391,36 @@ var ZoteroObsidianCitekeyLink = {
 		const escapedLabel = this.escapeRegExp(this.config.extraLabel);
 		const markerLine = new RegExp(
 			`^\\s*${escapedLabel}\\s*:\\s*obsidian:\\/\\/open\\?[^\\r\\n]*\\s*$`,
-			"i"
+			'i',
 		);
 
-		const lines = String(extra || "")
-			.replace(/\r\n/g, "\n")
-			.split("\n")
+		const lines = String(extra || '')
+			.replace(/\r\n/g, '\n')
+			.split('\n')
 			.filter((line) => !markerLine.test(line));
 
 		while (lines.length && !lines[lines.length - 1].trim()) {
 			lines.pop();
 		}
 
-		return lines.join("\n");
+		return lines.join('\n');
 	},
 
 	escapeRegExp(value) {
-		return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+		return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 	},
 
 	alert(win, message) {
 		try {
 			Services.prompt.alert(win, this.TITLE, String(message));
-		}
-		catch (error) {
+		} catch (error) {
 			win.alert(`${this.TITLE}\n\n${message}`);
 		}
 	},
 
 	handleError(win, action, error) {
-		Zotero.debug(
-			`Zotero Citekey Bridge: ${action} failed`
-		);
+		Zotero.debug(`Zotero Citekey Bridge: ${action} failed`);
 		Zotero.logError(error);
-		this.alert(
-			win,
-			`${action}失败：\n\n${error?.message || String(error)}`
-		);
-	}
+		this.alert(win, `${action}失败：\n\n${error?.message || String(error)}`);
+	},
 };
