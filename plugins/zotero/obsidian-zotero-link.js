@@ -10,6 +10,26 @@ var ZoteroObsidianCitekeyLink = {
 		createBaseURL: 'obsidian://zotero-note',
 	}),
 
+	// Read config from Zotero preferences, falling back to the defaults above.
+	// Use the "global" flag so Zotero.Prefs does not prepend "extensions.zotero."
+	getConfigValue(name) {
+		try {
+			const value = Zotero.Prefs.get(
+				`extensions.zotero-citekey-bridge.${name}`,
+				true
+			);
+			if (value !== undefined && value !== null && value !== '') {
+				return value;
+			}
+		}
+		catch (error) {
+			Zotero.debug(
+				`Zotero Citekey Bridge: failed to read pref ${name}`
+			);
+		}
+		return this.config[name];
+	},
+
 	init({ id, version, rootURI }) {
 		this.id = id;
 		this.version = version;
@@ -40,6 +60,16 @@ var ZoteroObsidianCitekeyLink = {
 		if (!popup) {
 			Zotero.debug('Zotero Citekey Bridge: #zotero-itemmenu not found');
 			return;
+		}
+
+		// Idempotency guard: remove any leftover plugin menu items (e.g. from
+		// a stale plugin instance after remove+reinstall) so duplicates cannot
+		// accumulate even if the reference-based windows map check fails.
+		for (const element of popup.querySelectorAll(
+			`#${this.MENU_PREFIX}-separator, #${this.MENU_PREFIX}-create, ` +
+			`#${this.MENU_PREFIX}-delete, #${this.MENU_PREFIX}-open`
+		)) {
+			element.remove();
 		}
 
 		const createXULElement = (tagName) => {
@@ -346,15 +376,16 @@ var ZoteroObsidianCitekeyLink = {
 
 	buildCreateURL(citekey) {
 		return (
-			`${this.config.createBaseURL}?citekey=` + encodeURIComponent(citekey)
+			`${this.getConfigValue('createBaseURL')}?citekey=` +
+			encodeURIComponent(citekey)
 		);
 	},
 
 	buildOpenURL(citekey) {
-		const file = `${this.config.folder}/${citekey}`;
+		const file = `${this.getConfigValue('folder')}/${citekey}`;
 		return (
 			'obsidian://open?vault=' +
-			encodeURIComponent(this.config.vaultName) +
+			encodeURIComponent(this.getConfigValue('vaultName')) +
 			'&file=' +
 			encodeURIComponent(file) +
 			'&paneType=tab'
@@ -363,7 +394,7 @@ var ZoteroObsidianCitekeyLink = {
 
 	getStoredLink(item) {
 		const extra = String(item.getField('extra') || '');
-		const escapedLabel = this.escapeRegExp(this.config.extraLabel);
+		const escapedLabel = this.escapeRegExp(this.getConfigValue('extraLabel'));
 		const match = extra.match(
 			new RegExp(
 				`^\\s*${escapedLabel}\\s*:\\s*(obsidian:\\/\\/open\\?[^\\r\\n]+?)\\s*$`,
@@ -382,13 +413,13 @@ var ZoteroObsidianCitekeyLink = {
 			lines.pop();
 		}
 
-		lines.push(`${this.config.extraLabel}: ${url}`);
+		lines.push(`${this.getConfigValue('extraLabel')}: ${url}`);
 		item.setField('extra', lines.join('\n'));
 		await item.saveTx();
 	},
 
 	removeLinkLines(extra) {
-		const escapedLabel = this.escapeRegExp(this.config.extraLabel);
+		const escapedLabel = this.escapeRegExp(this.getConfigValue('extraLabel'));
 		const markerLine = new RegExp(
 			`^\\s*${escapedLabel}\\s*:\\s*obsidian:\\/\\/open\\?[^\\r\\n]*\\s*$`,
 			'i',

@@ -1,0 +1,27 @@
+<vbox>
+	<groupbox>
+		<label><html:h2>Obsidian 连接</html:h2></label>
+		<description>配置从 Zotero 打开 Obsidian 笔记时使用的仓库和文件夹。</description>
+
+		<hbox align="center">
+			<label value="Vault 名称：" flex="1"/>
+			<html:input id="zobridge-vaultName" type="text"
+				preference="extensions.zotero-citekey-bridge.vaultName"
+				flex="2"/>
+		</hbox>
+
+		<hbox align="center">
+			<label value="笔记文件夹：" flex="1"/>
+			<html:input id="zobridge-folder" type="text"
+				preference="extensions.zotero-citekey-bridge.folder"
+				flex="2"/>
+		</hbox>
+
+		<hbox align="center">
+			<label value="Extra 标签名：" flex="1"/>
+			<html:input id="zobridge-extraLabel" type="text"
+				preference="extensions.zotero-citekey-bridge.extraLabel"
+				flex="2"/>
+		</hbox>
+	</groupbox>
+</vbox>

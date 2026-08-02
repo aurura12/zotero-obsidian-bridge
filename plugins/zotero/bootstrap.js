@@ -19,6 +19,11 @@ async function startup({ id, version, rootURI }) {
 
 	ZoteroObsidianCitekeyLink.init({ id, version, rootURI });
 	ZoteroObsidianCitekeyLink.addToAllWindows();
+
+	Zotero.PreferencePanes.register({
+		pluginID: id,
+		src: rootURI + "preferences.xhtml"
+	});
 }
 
 function onMainWindowLoad({ window }) {
