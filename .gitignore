@@ -25,3 +25,7 @@ desktop.ini
 .obsidian/workspace*
 .obsidian/cache/
 .trash/
+
+# Local planning/status notes (kept only in working copy)
+PLAN-settings-pane.md
+PROJECT-STATUS.md
