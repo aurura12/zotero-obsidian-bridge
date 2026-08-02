@@ -8,6 +8,7 @@ var ZoteroObsidianCitekeyLink = {
 		folder: 'maic',
 		extraLabel: 'Obsidian Link',
 		createBaseURL: 'obsidian://zotero-note',
+		openBaseURL: 'obsidian://zotero-open-note',
 	}),
 
 	// Read config from Zotero preferences, falling back to the defaults above.
@@ -194,7 +195,9 @@ var ZoteroObsidianCitekeyLink = {
 			this.alert(
 				win,
 				'该条目已经保存了 Obsidian 跳转链接，已停止重复创建。\n\n' +
-					'如需重新生成，请先执行“调试：删除 Obsidian 跳转链接”。',
+					'如果 Obsidian 中的笔记已被删除或重命名，无需删除此链接：' +
+					'请直接使用“打开 Obsidian 笔记”，Obsidian 会提示是否一键重建。\n\n' +
+					'如需彻底移除该关联，才需执行“调试：删除 Obsidian 跳转链接”。',
 			);
 			return;
 		}
@@ -268,10 +271,24 @@ var ZoteroObsidianCitekeyLink = {
 			return;
 		}
 
-		this.launchObsidianURL(link);
+		// 不直接使用存储链接（可能因笔记被移动而过期），而是走动态解析：
+		// Obsidian 端按 citekey 反查笔记实际路径、打开并回写新路径，
+		// 保证移动后仍能打开且 Extra 链接自动修复。
+		const citekey = await this.getCitationKey(item);
+		if (!citekey) {
+			this.alert(
+				win,
+				'未找到 citation key。\n\n' +
+					'请确认 Better BibTeX 已启用，并已为该条目生成 citation key。',
+			);
+			return;
+		}
+
+		this.launchObsidianURL(this.buildDynamicOpenURL(citekey));
 	},
 
 	launchObsidianURL(url) {
+		Zotero.debug(`Zotero Citekey Bridge: Launching: ${url}`);
 		const schemeMatch = String(url || '').match(/^([a-z][a-z0-9+.-]+):/i);
 		const scheme = schemeMatch?.[1]?.toLowerCase();
 		if (scheme !== 'obsidian') {
@@ -390,6 +407,201 @@ var ZoteroObsidianCitekeyLink = {
 			encodeURIComponent(file) +
 			'&paneType=tab'
 		);
+	},
+
+	buildDynamicOpenURL(citekey) {
+		const query = [
+			'citekey=' + encodeURIComponent(citekey),
+			'vault=' + encodeURIComponent(this.getConfigValue('vaultName')),
+			'folder=' + encodeURIComponent(this.getConfigValue('folder')),
+			'zport=' + encodeURIComponent(this.getHttpServerPort()),
+		].join('&');
+		return `${this.getConfigValue('openBaseURL')}?${query}`;
+	},
+
+	getHttpServerPort() {
+		try {
+			const port = Number(
+				Zotero.Prefs.get('extensions.zotero.httpServer.port', true),
+			);
+			if (Number.isInteger(port) && port > 0) {
+				return port;
+			}
+		} catch (error) {
+			Zotero.debug(
+				'Zotero Citekey Bridge: failed to read HTTP server port',
+			);
+		}
+		return 23119;
+	},
+
+	registerHTTPEndpoint() {
+		try {
+			if (!Zotero.Server?.Endpoints) {
+				Zotero.debug(
+					'Zotero Citekey Bridge: Zotero.Server.Endpoints unavailable',
+				);
+				return;
+			}
+			Zotero.Server.Endpoints['/zotero-citekey-bridge/update-link'] =
+				this.buildUpdateLinkEndpoint();
+			Zotero.debug('Zotero Citekey Bridge: HTTP endpoint registered');
+		} catch (error) {
+			Zotero.logError(error);
+		}
+	},
+
+	unregisterHTTPEndpoint() {
+		try {
+			if (Zotero.Server?.Endpoints) {
+				delete Zotero.Server.Endpoints[
+					'/zotero-citekey-bridge/update-link'
+				];
+			}
+		} catch (error) {
+			Zotero.logError(error);
+		}
+	},
+
+	buildUpdateLinkEndpoint() {
+		const bridge = this;
+
+		function updateLinkEndpoint() {}
+
+		updateLinkEndpoint.prototype.supportedMethods = ['POST'];
+		updateLinkEndpoint.prototype.supportedDataTypes = ['application/json'];
+		updateLinkEndpoint.prototype.permitBookmarklet = false;
+		updateLinkEndpoint.prototype.init = async function (request) {
+			return bridge.handleUpdateLinkRequest(request);
+		};
+
+		return updateLinkEndpoint;
+	},
+
+	async handleUpdateLinkRequest(request) {
+		const body = request.data || {};
+		const token = body.token || request.headers?.['x-citekey-bridge-token'] || '';
+
+		if (!this.checkWritebackToken(token)) {
+			return [
+				403,
+				'application/json',
+				JSON.stringify({ ok: false, error: 'invalid token' }),
+			];
+		}
+
+		const citekey = this.cleanCitationKey(body.citekey);
+		const filePath = String(body.filePath || '').trim();
+		const vaultName = String(body.vaultName || '').trim();
+
+		if (!citekey || !filePath) {
+			return [
+				400,
+				'application/json',
+				JSON.stringify({
+					ok: false,
+					error: 'missing citekey or filePath',
+				}),
+			];
+		}
+
+		try {
+			const item = await this.findItemByCitekey(citekey);
+			if (!item) {
+				return [
+					404,
+					'application/json',
+					JSON.stringify({ ok: false, error: 'item not found' }),
+				];
+			}
+
+			await this.updateStoredLink(item, filePath, vaultName);
+			return [200, 'application/json', JSON.stringify({ ok: true })];
+		} catch (error) {
+			Zotero.logError(error);
+			return [
+				500,
+				'application/json',
+				JSON.stringify({
+					ok: false,
+					error: String(error?.message || error),
+				}),
+			];
+		}
+	},
+
+	checkWritebackToken(token) {
+		const expected = String(this.getConfigValue('writebackToken') || '').trim();
+		return !expected || String(token || '').trim() === expected;
+	},
+
+	async findItemByCitekey(citekey) {
+		const key = this.cleanCitationKey(citekey);
+		if (!key) {
+			return null;
+		}
+
+		// 1) Better BibTeX KeyManager 反向查找（其公开 API 是正向 get(itemID)，
+		//    这里用 all() 取全部记录后按 citationKey 匹配）。
+		try {
+			const bbt = Zotero.BetterBibTeX;
+			if (bbt?.ready && typeof bbt.ready.then === 'function') {
+				await bbt.ready;
+			}
+
+			const all = bbt?.KeyManager?.all?.();
+			if (all) {
+				const records =
+					all instanceof Map ? [...all.values()] : Object.values(all);
+				for (const record of records) {
+					const recordKey = this.cleanCitationKey(
+						record?.citationKey || record?.citekey,
+					);
+					if (recordKey === key) {
+						const item = Zotero.Items.get(record.itemID);
+						if (item) {
+							return item;
+						}
+					}
+				}
+			}
+		} catch (error) {
+			Zotero.debug(
+				'Zotero Citekey Bridge: BBT KeyManager reverse lookup failed',
+			);
+		}
+
+		// 2) 兜底：全库扫描（写回频率低，O(n) 可接受）。
+		for (const item of Zotero.Items.getAll()) {
+			if (!item.isRegularItem?.()) {
+				continue;
+			}
+			const itemKey = await this.getCitationKey(item);
+			if (itemKey === key) {
+				return item;
+			}
+		}
+
+		return null;
+	},
+
+	async updateStoredLink(item, filePath, vaultName) {
+		const file = String(filePath || '').replace(/\.md$/i, '');
+		const url =
+			'obsidian://open?vault=' +
+			encodeURIComponent(vaultName || this.getConfigValue('vaultName')) +
+			'&file=' +
+			encodeURIComponent(file) +
+			'&paneType=tab';
+
+		// 幂等：与现有链接一致时跳过，避免无意义写入。
+		const existing = this.getStoredLink(item);
+		if (existing && existing === url) {
+			return false;
+		}
+
+		await this.setStoredLink(item, url);
+		return true;
 	},
 
 	getStoredLink(item) {

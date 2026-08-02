@@ -19,6 +19,7 @@ async function startup({ id, version, rootURI }) {
 
 	ZoteroObsidianCitekeyLink.init({ id, version, rootURI });
 	ZoteroObsidianCitekeyLink.addToAllWindows();
+	ZoteroObsidianCitekeyLink.registerHTTPEndpoint();
 
 	Zotero.PreferencePanes.register({
 		pluginID: id,
@@ -36,6 +37,7 @@ function onMainWindowUnload({ window }) {
 
 function shutdown() {
 	log("Shutting down");
+	ZoteroObsidianCitekeyLink?.unregisterHTTPEndpoint();
 	ZoteroObsidianCitekeyLink?.removeFromAllWindows();
 	ZoteroObsidianCitekeyLink = undefined;
 }

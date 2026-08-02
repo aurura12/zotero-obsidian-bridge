@@ -24,4 +24,20 @@
 				flex="2"/>
 		</hbox>
 	</groupbox>
+
+	<groupbox>
+		<label><html:h2>动态链接回写</html:h2></label>
+		<description>
+			当 Obsidian 中的笔记被移动后，此功能会把新路径回写回条目的 Extra 字段。
+			需要 Zotero → 设置 → 高级 → 勾选「允许本机其他应用访问」。
+		</description>
+
+		<hbox align="center">
+			<label value="回写令牌（可选）：" flex="1"/>
+			<html:input id="zobridge-writebackToken" type="password"
+				preference="extensions.zotero-citekey-bridge.writebackToken"
+				flex="2"/>
+		</hbox>
+		<description>两端（Zotero 与 Obsidian 插件设置）保持一致才生效；留空表示不校验。</description>
+	</groupbox>
 </vbox>
